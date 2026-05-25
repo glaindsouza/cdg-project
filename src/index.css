@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+:root {
+  --primary-orange: #f97316; /* Tailwind orange-500 */
+  --primary-yellow: #eab308; /* Tailwind yellow-500 */
+}
+
+body {
+  background-color: #f8fafc; /* slate-50 */
+  color: #0f172a; /* slate-900 */
+}
