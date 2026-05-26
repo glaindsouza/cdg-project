@@ -11,13 +11,14 @@ export function StudentAttendance() {
     fetchAttendanceStatus();
   }, []);
 
-  const fetchAttendanceStatus = async () => {
+const fetchAttendanceStatus = async () => {
   const { data: sessionData } = await supabase.auth.getSession();
 
   if (!sessionData.session) return;
 
   const user = sessionData.session.user;
 
+  // 1. Get events registered by this student
   const { data: registrations, error: regError } = await supabase
     .from("registrations")
     .select("event_id")
@@ -36,6 +37,7 @@ export function StudentAttendance() {
     return;
   }
 
+  // 2. Get attendance status only for those events
   const { data, error } = await supabase
     .from("attendance_requests")
     .select(`
