@@ -20,68 +20,76 @@ const [role, setRole] = useState("student");
 }, []);
 
 const checkSession = async () => {
+
   const { data } = await supabase.auth.getSession();
 
   if (!data.session) return;
 
   const user = data.session.user;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const roleFromMeta = user.user_metadata?.role;
 
-  const actualRole = profile?.role || user.user_metadata?.role || "student";
+  if (roleFromMeta === "student") {
 
-  if (actualRole === "student") {
-    if (!profile) {
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id);
+
+    if (!profileData || profileData.length === 0) {
       navigate({ to: "/student/profile-completion" });
       return;
     }
 
     navigate({ to: "/student/dashboard" });
-  } else if (actualRole === "club_admin") {
+
+  } else if (roleFromMeta === "club_admin") {
+
     navigate({ to: "/club-admin/dashboard" });
-  } else if (actualRole === "faculty") {
+
+  } else if (roleFromMeta === "faculty") {
+
     navigate({ to: "/faculty/dashboard" });
+
   }
 };
 
- const redirectByRole = async () => {
-  const { data: sessionData } = await supabase.auth.getSession();
+  const redirectByRole = async () => {
+  if (role === "student") {
 
-  if (!sessionData.session) return;
+    const { data: sessionData } = await supabase.auth.getSession();
 
-  const user = sessionData.session.user;
+    if (!sessionData.session) return;
 
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("user_id", user.id)
-    .maybeSingle();
+    const user = sessionData.session.user;
 
-  if (error) {
-    console.error(error);
-    toast.error(error.message);
-    return;
-  }
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id);
 
-  const actualRole = profile?.role || user.user_metadata?.role || role;
+    if (error) {
+      console.error(error);
+      return;
+    }
 
-  if (actualRole === "student") {
-    if (!profile) {
+    // No profile found → complete profile
+    if (!data || data.length === 0) {
       navigate({ to: "/student/profile-completion" });
       return;
     }
 
+    // Profile already exists → dashboard
     navigate({ to: "/student/dashboard" });
-  } else if (actualRole === "club_admin") {
+
+  } else if (role === "club_admin") {
+
     navigate({ to: "/club-admin/dashboard" });
-  } else if (actualRole === "faculty") {
+
+  } else if (role === "faculty") {
+
     navigate({ to: "/faculty/dashboard" });
-  } else {
-    toast.error("Role not found. Please contact admin.");
+
   }
 };
 
