@@ -154,10 +154,22 @@ const updateStatus = async (
                       </div>
                     </div>
 
-                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-bold border border-blue-100 hover:bg-blue-100 transition-colors">
-                      <FileSpreadsheet size={16} />
-                      Attendance Sheet
-                    </button>
+                    {req.file_url ? (
+  <a
+    href={req.file_url}
+    target="_blank"
+    rel="noreferrer"
+    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-bold border border-blue-100 hover:bg-blue-100 transition-colors w-fit"
+  >
+    <FileSpreadsheet size={16} />
+    View Attendance Sheet
+  </a>
+) : (
+  <button className="flex items-center gap-2 px-4 py-2 bg-slate-50 text-slate-400 rounded-lg text-sm font-bold border border-slate-100 cursor-not-allowed">
+    <FileSpreadsheet size={16} />
+    No Sheet Uploaded
+  </button>
+)}
                   </div>
 
                   {/* Actions */}
